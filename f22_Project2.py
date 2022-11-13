@@ -186,10 +186,10 @@ def check_policy_numbers(data):
     one_form = r'20\d\d-00\d\d\d\dSTR'
     two_form = r'STR-000\d\d\d\d'
     for datas in data:
-        first = re.search(one_form, datas[3])
-        second = re.search(two_form, datas[3])
         if datas[3] == 'Pending' or datas[3] == 'Exempt':
             continue
+        first = re.search(one_form, datas[3])
+        second = re.search(two_form, datas[3])
         if not first and not second:
             incorrect_format.append(datas[2])
     return incorrect_format
@@ -208,8 +208,25 @@ def extra_credit(listing_id):
     gone over their 90 day limit, else return True, indicating the lister has
     never gone over their limit.
     """
-    pass
-
+    f = open('html_files/listing_'+listing_id+'_reviews.html', encoding = 'utf-8')
+    soup = BeautifulSoup(f, 'html.parser')
+    f.close()
+    li = soup.find_all('li', class_='_1f1oir5')
+    review = []
+    for comment in li:
+        reg = re.findall(r'?=(\d\d\d\d)', comment.text)
+        review.append(reg)
+    dict = {}
+    for i in review:
+        for year in i:
+            dict[year] = dict.get(year, 0) + 1
+    for review_amount in dict.values():
+        if review_amount > 90:
+            return False
+        else:
+            return True
+    return True
+    
 class TestCases(unittest.TestCase):
 
     def test_get_listings_from_search_results(self):
