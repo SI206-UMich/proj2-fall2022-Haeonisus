@@ -154,13 +154,14 @@ def write_csv(data, filename):
 
     This function should not return anything.
     """
-    with open(filename, 'w', newline='\n', encoding='utf-8') as f:
-        write = csv.writer(f)
-        header_row = ['Listing Title', 'Cost', 'Listing ID', 'Policy Number', 'Place Type','Number of Bedrooms']
-        write.writerow(header_row)
-        sort_data = sorted(data, key=lambda x:x[1])
-        for info in sort_data:
-            write.writerow(info)
+    f = open(filename, 'w', newline='\n', encoding='utf-8')
+    write = csv.writer(f)
+    header_row = ['Listing Title', 'Cost', 'Listing ID', 'Policy Number', 'Place Type','Number of Bedrooms']
+    write.writerow(header_row)
+    sort_data = sorted(data, key=lambda x:x[1])
+    for info in sort_data:
+        write.writerow(info)
+    f.close()
 
 def check_policy_numbers(data):
     """
@@ -207,7 +208,24 @@ def extra_credit(listing_id):
     gone over their 90 day limit, else return True, indicating the lister has
     never gone over their limit.
     """
-    pass
+    '''f = open('html_files/listing_'+listing_id+'_reviews.html', encoding = 'utf-8')
+    soup = BeautifulSoup(f, 'html.parser')
+    f.close()
+    li = soup.find_all('li', class_='_1f1oir5')
+    review = []
+    for comment in li:
+        reg = re.findall(r'?=(\d\d\d\d)', comment.text)
+        review.append(reg)
+    dict = {}
+    for i in review:
+        for year in i:
+            dict[year] = dict.get(year, 0) + 1
+    for review_amount in dict.values():
+        if review_amount > 90:
+            return False
+    return True'''
+
+
 
 
 class TestCases(unittest.TestCase):
@@ -293,9 +311,9 @@ class TestCases(unittest.TestCase):
         # check that the header row is correct
         self.assertEqual(csv_lines[0], ["Listing Title","Cost","Listing ID","Policy Number","Place Type","Number of Bedrooms"])
         # check that the next row is Private room in Mission District,82,51027324,Pending,Private Room,1
-        self.assertEqual(csv_lines[1], ['Private room in Mission District',82,'51027324','Pending','Private Room',1])
+        self.assertEqual(csv_lines[1], ['Private room in Mission District','82','51027324','Pending','Private Room','1'])
         # check that the last row is Apartment in Mission District,399,28668414,Pending,Entire Room,2
-        self.assertEqual(csv_lines[-1], ['Apartment in Mission District', 399,'28668414','Pending','Entire Room',2])
+        self.assertEqual(csv_lines[-1], ['Apartment in Mission District','399','28668414','Pending','Entire Room','2'])
 
     def test_check_policy_numbers(self):
         # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
