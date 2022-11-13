@@ -1,10 +1,14 @@
+# Your name:    Haewon Park
+# Your student id:  9139 7697
+# Your email:   phwon@umich.edu
+# List who you have worked with on this homework:   Alone
+
 from xml.sax import parseString
 from bs4 import BeautifulSoup
-import re
-import os
 import csv
+import os
+import re
 import unittest
-
 
 def get_listings_from_search_results(html_file):
     """
@@ -25,8 +29,26 @@ def get_listings_from_search_results(html_file):
         ('Loft in Mission District', 210, '1944564'),  # example
     ]
     """
-    pass
-
+    f = open(html_file, encoding = 'utf-8')
+    soup = BeautifulSoup(f, 'html.parser')
+    title = []
+    cost = []
+    id = []
+    title_list = soup.find_all('div', class_='t1jojoys dir dir-ltr')
+    for div in title_list:
+        get_title = div.text
+        title.append(get_title)
+    cost_list = soup.find_all('span', class_='_tyxjp1')
+    for span in cost_list:
+        get_cost = span.text
+        without_dollar = get_cost[1:]
+        int_cost = int(without_dollar)
+        cost.append(int_cost)
+    listing = []
+    for i in range(len(title_list)):
+        id.append(title_list[i].get('id').split("_")[1])
+        listing.append((title[i], cost[i], id[i]))
+    return listing
 
 def get_listing_information(listing_id):
     """
@@ -147,13 +169,16 @@ class TestCases(unittest.TestCase):
         # check that the variable you saved after calling the function is a list
         self.assertEqual(type(listings), list)
         # check that each item in the list is a tuple
-
+        for item in listings:
+            self.assertEqual(type(item), tuple)
         # check that the first title, cost, and listing id tuple is correct (open the search results html and find it)
-
+        self.assertEqual(listings[0][0], 'Loft in Mission District')
+        self.assertEqual(listings[0][1], 210)
+        self.assertEqual(listings[0][2], '1944564')
         # check that the last title is correct (open the search results html and find it)
-        pass
+        self.assertEqual(listings[19][0], 'Guest suite in Mission District')
 
-    def test_get_listing_information(self):
+    '''def test_get_listing_information(self):
         html_list = ["1623609",
                      "1944564",
                      "1550913",
@@ -235,7 +260,7 @@ class TestCases(unittest.TestCase):
         # check that the element in the list is a string
 
         # check that the first element in the list is '16204265'
-        pass
+        pass'''
 
 
 if __name__ == '__main__':
