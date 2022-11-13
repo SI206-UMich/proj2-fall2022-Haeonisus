@@ -31,6 +31,7 @@ def get_listings_from_search_results(html_file):
     """
     f = open(html_file, encoding = 'utf-8')
     soup = BeautifulSoup(f, 'html.parser')
+    f.close()
     title = []
     cost = []
     id = []
@@ -74,8 +75,40 @@ def get_listing_information(listing_id):
         number of bedrooms
     )
     """
-    pass
+    f = open('html_files/listing_'+listing_id+'.html', encoding = 'utf-8')
+    soup = BeautifulSoup(f, 'html.parser')
+    f.close()
 
+    policy_number = []
+    new_policy_number = []
+    li_list = soup.find('li', class_ = 'f19phm7j dir dir-ltr')
+    policy = li_list.find('span', class_='ll4r2nl dir dir-ltr')
+    policy_number.append(policy.text)
+    for pol in policy_number:
+        if "pending" in pol.lower():
+            new_policy_number.append('Pending')
+        elif pol[0] == "L":
+            new_policy_number.append("Exempt")
+        else:
+            new_policy_number.append(pol)
+    place_type = []
+    type = soup.find('div', class_="_cv5qq4")
+    lower_type = type.text.lower()
+    if "private" in lower_type:
+        place_type.append("Private Room")
+    elif "shared" in lower_type:
+        place_type.append("Shared Room")
+    else:
+        place_type.append("Entire Room")
+    number_of_bedrooms = []
+    number_of_bed = soup.find_all("li", class_ = "l7n4lsf dir dir-ltr")[1]
+    bed_number = number_of_bed.find_all("span")[2]
+    for number in bed_number:
+        if number == "studio" or number == "Studio":
+            number_of_bedrooms.append(1)
+        else:
+            number_of_bedrooms.append(number[0])
+    return (new_policy_number[0], place_type[0], int(number_of_bedrooms[0]))
 
 def get_detailed_listing_database(html_file):
     """
@@ -92,7 +125,6 @@ def get_detailed_listing_database(html_file):
     ]
     """
     pass
-
 
 def write_csv(data, filename):
     """
@@ -178,7 +210,7 @@ class TestCases(unittest.TestCase):
         # check that the last title is correct (open the search results html and find it)
         self.assertEqual(listings[19][0], 'Guest suite in Mission District')
 
-    '''def test_get_listing_information(self):
+    def test_get_listing_information(self):
         html_list = ["1623609",
                      "1944564",
                      "1550913",
@@ -199,14 +231,13 @@ class TestCases(unittest.TestCase):
             # check that the third element in the tuple is an int
             self.assertEqual(type(listing_information[2]), int)
         # check that the first listing in the html_list has policy number 'STR-0001541'
-
+        self.assertEqual(listing_informations[0][0], 'STR-0001541')
         # check that the last listing in the html_list is a "Private Room"
-
+        self.assertEqual(listing_informations[-1][1], 'Private Room')
         # check that the third listing has one bedroom
+        self.assertEqual(listing_informations[2][2], 1)
 
-        pass
-
-    def test_get_detailed_listing_database(self):
+    '''def test_get_detailed_listing_database(self):
         # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
         # and save it to a variable
         detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
@@ -223,7 +254,6 @@ class TestCases(unittest.TestCase):
         # check that the last tuple is made up of the following:
         # 'Guest suite in Mission District', 238, '32871760', 'STR-0004707', 'Entire Room', 1
 
-        pass
 
     def test_write_csv(self):
         # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
