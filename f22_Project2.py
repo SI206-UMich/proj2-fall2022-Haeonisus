@@ -87,13 +87,13 @@ def get_listing_information(listing_id):
     for pol in policy_number:
         if "pending" in pol.lower():
             new_policy_number.append('Pending')
-        elif pol[0] == "L":
+        elif "OSTR" in pol:
             new_policy_number.append("Exempt")
         else:
             new_policy_number.append(pol)
     place_type = []
-    type = soup.find('div', class_="_cv5qq4")
-    lower_type = type.text.lower()
+    div = soup.find('div', class_="_cv5qq4")
+    lower_type = div.text.lower()
     if "private" in lower_type:
         place_type.append("Private Room")
     elif "shared" in lower_type:
@@ -104,7 +104,8 @@ def get_listing_information(listing_id):
     number_of_bed = soup.find_all("li", class_ = "l7n4lsf dir dir-ltr")[1]
     bed_number = number_of_bed.find_all("span")[2]
     for number in bed_number:
-        if number == "studio" or number == "Studio":
+        number = number.lower()
+        if number == "studio":
             number_of_bedrooms.append(1)
         else:
             number_of_bedrooms.append(number[0])
