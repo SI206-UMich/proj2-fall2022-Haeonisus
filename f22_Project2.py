@@ -181,8 +181,17 @@ def check_policy_numbers(data):
     ]
 
     """
-    pass
-
+    incorrect_format = []
+    one_form = r'20\d\d-00\d\d\d\dSTR'
+    two_form = r'STR-000\d\d\d\d'
+    for datas in data:
+        first = re.search(one_form, datas[3])
+        second = re.search(two_form, datas[3])
+        if datas[3] == 'Pending' or datas[3] == 'Exempt':
+            continue
+        if not first and not second:
+            incorrect_format.append(datas[2])
+    return incorrect_format
 
 def extra_credit(listing_id):
     """
@@ -288,7 +297,7 @@ class TestCases(unittest.TestCase):
         # check that the last row is Apartment in Mission District,399,28668414,Pending,Entire Room,2
         self.assertEqual(csv_lines[-1], ['Apartment in Mission District', 399,'28668414','Pending','Entire Room',2])
 
-    '''def test_check_policy_numbers(self):
+    def test_check_policy_numbers(self):
         # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
         # and save the result to a variable
         detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
@@ -297,12 +306,11 @@ class TestCases(unittest.TestCase):
         # check that the return value is a list
         self.assertEqual(type(invalid_listings), list)
         # check that there is exactly one element in the string
-
+        self.assertEqual(len(invalid_listings), 1)
         # check that the element in the list is a string
-
+        self.assertEqual(type(invalid_listings[0]), str)
         # check that the first element in the list is '16204265'
-        pass'''
-
+        self.assertEqual(invalid_listings[0], '16204265')
 
 if __name__ == '__main__':
     database = get_detailed_listing_database("html_files/mission_district_search_results.html")
