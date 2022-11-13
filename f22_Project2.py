@@ -124,7 +124,13 @@ def get_detailed_listing_database(html_file):
         ...
     ]
     """
-    pass
+    information_listing = []
+    search_result = get_listings_from_search_results(html_file)
+    for result in search_result:
+        list_id = result[2]
+        info_id = get_listing_information(list_id)
+        information_listing.append(result + info_id)
+    return information_listing
 
 def write_csv(data, filename):
     """
@@ -237,7 +243,7 @@ class TestCases(unittest.TestCase):
         # check that the third listing has one bedroom
         self.assertEqual(listing_informations[2][2], 1)
 
-    '''def test_get_detailed_listing_database(self):
+    def test_get_detailed_listing_database(self):
         # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
         # and save it to a variable
         detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
@@ -247,15 +253,16 @@ class TestCases(unittest.TestCase):
             # assert each item in the list of listings is a tuple
             self.assertEqual(type(item), tuple)
             # check that each tuple has a length of 6
-
+            self.assertEqual(len(item), 6)
         # check that the first tuple is made up of the following:
         # 'Loft in Mission District', 210, '1944564', '2022-004088STR', 'Entire Room', 1
-
+        self.assertEqual(detailed_database[0], ('Loft in Mission District', 210, '1944564', '2022-004088STR', 'Entire Room', 1))
         # check that the last tuple is made up of the following:
         # 'Guest suite in Mission District', 238, '32871760', 'STR-0004707', 'Entire Room', 1
+        self.assertEqual(detailed_database[19], ('Guest suite in Mission District', 238, '32871760', 'STR-0004707', 'Entire Room', 1))
 
 
-    def test_write_csv(self):
+    '''def test_write_csv(self):
         # call get_detailed_listing_database on "html_files/mission_district_search_results.html"
         # and save the result to a variable
         detailed_database = get_detailed_listing_database("html_files/mission_district_search_results.html")
